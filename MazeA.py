@@ -1,4 +1,5 @@
 from pyamaze import maze, agent, COLOR
+import time
 
 #Obtener distancia entre dos puntos
 def h(c1,c2):
@@ -6,8 +7,8 @@ def h(c1,c2):
     x2,y2 = c2
     return abs(x1-x2) + abs(y1-y2)
 
-def aStar(m):
-    start = (m.rows, m.cols)
+def aStar(m, x, y):
+    start = (x, y)
     list = [(h(start, m._goal), start)]
     reversePath = {}
     g = {cell: float('inf') for cell in m.grid}
@@ -42,31 +43,35 @@ def aStar(m):
                     g[childCell] = temp_g
                     f[childCell] = temp_f
                     list.append((temp_f, childCell))
-        
+                print("Actual: ", cActual, "Vecino: ", childCell, "f_temp: ", temp_f, "f[vecino]: ", f[childCell], "g_temp: ", temp_g, "g[vecino]:", g[childCell])
     opPath = {}
     cell = m._goal
     while cell != start:
         opPath[reversePath[cell]] = cell
-        print(cell)
         cell = reversePath[cell]
-        print(cell)
     return searchPath, reversePath, opPath
     
     
+tiempo_inicial = time.time()
 
 # Crear un laberinto
 m = maze(10,10)
-m.CreateMaze(loopPercent = 60, theme = COLOR.blue)
-searchPath, reversePath, opPath=aStar(m)
+m.CreateMaze(4,9,loopPercent = 60, theme = COLOR.blue)
+x=10
+y=2
+searchPath, reversePath, opPath=aStar(m, x, y)
 
-a=agent(m, footprints=True, color=COLOR.blue, shape='square')
-c=agent(m,footprints=True,color=COLOR.red, filled = True, shape='square')
+a=agent(m, x, y, footprints=True, color=COLOR.blue, shape='square')
+c=agent(m, x, y, footprints=True,color=COLOR.red, shape='arrow', filled = True)
 
 m.tracePath({a:searchPath})
 m.tracePath({c:opPath})
 print(m.maze_map)
 print(len(searchPath))
 print(len(opPath))
+tiempo_final = time.time()
+tiempo_ejecucion = tiempo_final - tiempo_inicial
+print('El tiempo de ejecucion fue:',tiempo_ejecucion) #En segundos
 m.run()
 
 
