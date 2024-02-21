@@ -12,6 +12,7 @@ def aStar(m, x, y):
     list = [(h(start, m._goal), start)]
     reversePath = {}
     g = {cell: float('inf') for cell in m.grid}
+    print(g)
     g[start] = 0
     f = {cell: float('inf') for cell in m.grid}
     f[start] = h(start, m._goal)
@@ -62,10 +63,10 @@ y=2
 searchPath, reversePath, opPath=aStar(m, x, y)
 
 a=agent(m, x, y, footprints=True, color=COLOR.blue, shape='square')
-c=agent(m, x, y, footprints=True,color=COLOR.red, shape='arrow', filled = True)
+b=agent(m, x, y, footprints=True,color=COLOR.red, shape='arrow', filled = True)
 
 m.tracePath({a:searchPath})
-m.tracePath({c:opPath})
+m.tracePath({b:opPath})
 print(m.maze_map)
 print(len(searchPath))
 print(len(opPath))
