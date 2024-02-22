@@ -39,9 +39,9 @@ def evaluar(tablero, simbolo, oponente):
 
     return 0
 
-def minimax(tablero, profundidad, es_max, simbolo, oponente):
+def minimax(tablero, profundidad, es_max, simbolo, oponente, alpha, beta):
     """
-    Implementación del algoritmo Minimax para encontrar el mejor movimiento.
+    Implementación del algoritmo Minimax con poda alfa-beta para encontrar el mejor movimiento.
     """
     puntaje = evaluar(tablero, simbolo, oponente)
 
@@ -62,20 +62,31 @@ def minimax(tablero, profundidad, es_max, simbolo, oponente):
             if tablero[fila][col] == " ":
                 # Realiza el movimiento y llama recursivamente a minimax
                 tablero[fila][col] = simbolo if es_max else oponente
-                puntaje_actual = minimax(tablero, profundidad + 1, not es_max, simbolo, oponente)
+                puntaje_actual = minimax(tablero, profundidad + 1, not es_max, simbolo, oponente, alpha, beta)
                 tablero[fila][col] = " "  # Deshace el movimiento
 
-                # Actualiza el mejor puntaje
-                mejor = max(puntaje_actual, mejor) if es_max else min(puntaje_actual, mejor)
+                # Actualiza el mejor puntaje y los valores de alfa y beta
+                if es_max:
+                    mejor = max(puntaje_actual, mejor)
+                    alpha = max(alpha, puntaje_actual)
+                else:
+                    mejor = min(puntaje_actual, mejor)
+                    beta = min(beta, puntaje_actual)
+
+                # Realiza la poda alfa-beta
+                if beta <= alpha:
+                    break
 
     return mejor
 
 def encontrar_mejor_movimiento(tablero, simbolo, oponente):
     """
-    Encuentra el mejor movimiento posible utilizando el algoritmo Minimax.
+    Encuentra el mejor movimiento posible utilizando el algoritmo Minimax con poda alfa-beta.
     """
     mejor_valor = float('-inf')  # Inicializa el mejor valor como menos infinito
     mejores_movimientos = []  # Lista para almacenar los mejores movimientos encontrados
+    alpha = float('-inf')  # Valor de alfa inicial
+    beta = float('inf')  # Valor de beta inicial
 
     # Recorre el tablero buscando los espacios vacíos
     for fila in range(3):
@@ -83,7 +94,7 @@ def encontrar_mejor_movimiento(tablero, simbolo, oponente):
             if tablero[fila][col] == " ":
                 # Realiza el movimiento y llama a minimax para evaluar el tablero
                 tablero[fila][col] = simbolo
-                valor_movimiento = minimax(tablero, 0, False, simbolo, oponente)
+                valor_movimiento = minimax(tablero, 0, False, simbolo, oponente, alpha, beta)
                 tablero[fila][col] = " "  # Deshace el movimiento
 
                 # Actualiza el mejor valor y la lista de mejores movimientos
@@ -92,6 +103,9 @@ def encontrar_mejor_movimiento(tablero, simbolo, oponente):
                     mejor_valor = valor_movimiento
                 elif valor_movimiento == mejor_valor:
                     mejores_movimientos.append((fila, col))
+
+                # Actualiza el valor de alfa
+                alpha = max(alpha, valor_movimiento)
 
     # Imprime el valor del mejor movimiento y retorna uno aleatorio entre los mejores movimientos
     print("El valor del mejor movimiento es:", mejor_valor)
@@ -125,8 +139,10 @@ def jugar(tablero, simbolo, oponente, funcion_jugada):
     """
     Ejecuta un movimiento en el tablero utilizando la función de jugada proporcionada.
     """
+   
     fila, columna = funcion_jugada(tablero, simbolo, oponente)
-    tablero[fila][columna] = simbolo
+    tablero[fila][columna] = simbolo 
+    imprimir_tablero(tablero) # Se imprime el tablero por cada uno de los juegos de la simulacion.
 
 def humano_juega(tablero, simbolo, oponente):
     """
@@ -144,7 +160,7 @@ def aleatorio_juega(tablero, simbolo, oponente):
 
 def minMax_juega(tablero, simbolo, oponente):
     """
-    Permite a MinMax realizar un movimiento utilizando el algoritmo Minimax.
+    Permite a MinMax realizar un movimiento utilizando el algoritmo Minimax con poda alfa-beta.
     """
     print("Turno del jugador MinMax:")
     return encontrar_mejor_movimiento(tablero, simbolo, oponente)
@@ -155,27 +171,48 @@ def main():
     """
     global contador_min, contador_perdidas
     tablero = [[" " for _ in range(3)] for _ in range(3)]
-    imprimir_tablero(tablero)
     jugadores_seleccionados = seleccionar_jugadores()
     turno = "X"
+    numero_partida = 1
     while hay_mas_movimientos(tablero):
+        print("Partida:", numero_partida)
         if jugadores_seleccionados[turno] == 0:
             jugar(tablero, turno, "O" if turno == "X" else "X", minMax_juega)
         elif jugadores_seleccionados[turno] == 1:
             jugar(tablero, turno, "O" if turno == "X" else "X", humano_juega)
         else:
             jugar(tablero, turno, "O" if turno == "X" else "X", aleatorio_juega)
-        imprimir_tablero(tablero)
-        if evaluar(tablero, turno, "O" if turno == "X" else "X") in {1, -1}:
+        resultado = evaluar(tablero, turno, "O" if turno == "X" else "X")
+        if resultado == 1:
             if jugadores_seleccionados[turno] == 0:
                 contador_min += 1
+                print(f"Ganador de la Partida {numero_partida}: {jugadores[jugadores_seleccionados[turno]]} (MinMax)")
             else:
                 contador_perdidas += 1
-            print(f"Ganador: {jugadores[jugadores_seleccionados[turno]]}")
+                print(f"Ganador de la Partida {numero_partida}: {jugadores[jugadores_seleccionados[turno]]} (Humano o Aleatorio)")
+            break
+        elif resultado == -1:
+            if jugadores_seleccionados[turno] == 0:
+                contador_perdidas += 1
+                print(f"Ganador de la Partida {numero_partida}: {jugadores[jugadores_seleccionados[turno]]} (Humano o Aleatorio)")
+            else:
+                contador_min += 1
+                print(f"Ganador de la Partida {numero_partida}: {jugadores[jugadores_seleccionados[turno]]} (MinMax)")
             break
         turno = "O" if turno == "X" else "X"
+        numero_partida += 1
+    
+    # Si no hay ganador y el bucle termina, se considera un empate
     else:
+        print("Partida:", numero_partida)
         print("¡Empate!")
+    
+    # Imprimir tablero final y resultados fuera del bucle
+    imprimir_tablero(tablero)
+    print("=" * 20)
+
+
+
 
 def simulacion_varios_juegos():
     """
@@ -185,8 +222,9 @@ def simulacion_varios_juegos():
     contador_min = 0  # Reinicia el contador de victorias de MinMax
     contador_perdidas = 0  # Reinicia el contador de derrotas de MinMax
     contador_empates = 0  # Contador de empates
-    juegos = 500  # Número de juegos a simular
-    for _ in range(juegos):
+    juegos = 10  # Número de juegos a simular
+    for partida in range(1, juegos + 1):
+        print("Partida:", partida)
         tablero = [[" " for _ in range(3)] for _ in range(3)]  # Inicializa un nuevo tablero
         jugadores_seleccionados = {"X": 0, "O": 2}  # MinMax juega primero
         turno = "X"  # Inicia el turno en X
@@ -195,20 +233,37 @@ def simulacion_varios_juegos():
                 jugar(tablero, turno, "O" if turno == "X" else "X", minMax_juega)
             else:
                 jugar(tablero, turno, "O" if turno == "X" else "X", aleatorio_juega)
-            if evaluar(tablero, turno, "O" if turno == "X" else "X") in {10, -10}:
+            resultado = evaluar(tablero, turno, "O" if turno == "X" else "X")
+            if resultado == 1:
                 if jugadores_seleccionados[turno] == 0:
                     contador_min += 1
+                    print(f"Ganador de la Partida {partida}: {jugadores[jugadores_seleccionados[turno]]} (MinMax)")
                 else:
                     contador_perdidas += 1
+                    print(f"Ganador de la Partida {partida}: {jugadores[jugadores_seleccionados[turno]]} (Humano o Aleatorio)")
+                break
+            elif resultado == -1:
+                if jugadores_seleccionados[turno] == 0:
+                    contador_perdidas += 1
+                    print(f"Ganador de la Partida {partida}: {jugadores[jugadores_seleccionados[turno]]} (Humano o Aleatorio)")
+                else:
+                    contador_min += 1
+                    print(f"Ganador de la Partida {partida}: {jugadores[jugadores_seleccionados[turno]]} (MinMax)")
                 break
             turno = "O" if turno == "X" else "X"
         else:
             # Si el bucle termina sin un ganador, se considera un empate
             contador_empates += 1
+            print("Partida:", partida)
+            print("¡Empate!")
+        print("=" * 20)
     print("\nResultados de la simulación:")
     print(f"Ganadas por MinMax: {contador_min}")
     print(f"Perdidas contra Aleatorio: {contador_perdidas}")
     print(f"Empates: {contador_empates}")
+
+
+
 
 if __name__ == "__main__":
     opcion = input("Ingresa 1 para jugar normalmente o 2 para hacer una simulación: ")
