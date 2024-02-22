@@ -12,6 +12,7 @@ def aStar(m, x, y):
     list = [(h(start, m._goal), start)]
     reversePath = {}
     g = {cell: float('inf') for cell in m.grid}
+    print(g)
     g[start] = 0
     f = {cell: float('inf') for cell in m.grid}
     f[start] = h(start, m._goal)
