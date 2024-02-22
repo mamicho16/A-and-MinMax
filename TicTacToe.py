@@ -20,22 +20,22 @@ def evaluar(tablero, simbolo, oponente):
     # Revisar filas
     for fila in tablero:
         if all(casilla == simbolo for casilla in fila):
-            return 10
+            return 1
         elif all(casilla == oponente for casilla in fila):
-            return -10
+            return -1
 
     # Revisar columnas
     for col in range(3):
         if all(tablero[fila][col] == simbolo for fila in range(3)):
-            return 10
+            return 1
         elif all(tablero[fila][col] == oponente for fila in range(3)):
-            return -10
+            return -1
 
     # Revisar diagonales
     if all(tablero[i][i] == simbolo for i in range(3)) or all(tablero[i][2 - i] == simbolo for i in range(3)):
-        return 10
+        return 1
     elif all(tablero[i][i] == oponente for i in range(3)) or all(tablero[i][2 - i] == oponente for i in range(3)):
-        return -10
+        return -1
 
     return 0
 
@@ -46,7 +46,7 @@ def minimax(tablero, profundidad, es_max, simbolo, oponente):
     puntaje = evaluar(tablero, simbolo, oponente)
 
     # Si ya hay un ganador, retorna el puntaje
-    if puntaje in {10, -10}:
+    if puntaje in {1, -1}:
         return puntaje
 
     # Si no hay más movimientos posibles, retorna empate
@@ -166,7 +166,7 @@ def main():
         else:
             jugar(tablero, turno, "O" if turno == "X" else "X", aleatorio_juega)
         imprimir_tablero(tablero)
-        if evaluar(tablero, turno, "O" if turno == "X" else "X") in {10, -10}:
+        if evaluar(tablero, turno, "O" if turno == "X" else "X") in {1, -1}:
             if jugadores_seleccionados[turno] == 0:
                 contador_min += 1
             else:
@@ -185,7 +185,7 @@ def simulacion_varios_juegos():
     contador_min = 0  # Reinicia el contador de victorias de MinMax
     contador_perdidas = 0  # Reinicia el contador de derrotas de MinMax
     contador_empates = 0  # Contador de empates
-    juegos = 2  # Número de juegos a simular
+    juegos = 500  # Número de juegos a simular
     for _ in range(juegos):
         tablero = [[" " for _ in range(3)] for _ in range(3)]  # Inicializa un nuevo tablero
         jugadores_seleccionados = {"X": 0, "O": 2}  # MinMax juega primero
