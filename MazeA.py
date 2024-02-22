@@ -12,7 +12,6 @@ def aStar(m, x, y):
     list = [(h(start, m._goal), start)]
     reversePath = {}
     g = {cell: float('inf') for cell in m.grid}
-    print(g)
     g[start] = 0
     f = {cell: float('inf') for cell in m.grid}
     f[start] = h(start, m._goal)
@@ -29,22 +28,22 @@ def aStar(m, x, y):
         for d in 'ESNW':
             if m.maze_map[cActual][d]:
                 if d == 'E':
-                    childCell = (cActual[0], cActual[1] + 1)
+                    vecino = (cActual[0], cActual[1] + 1)
                 elif d == 'W':
-                    childCell = (cActual[0], cActual[1] - 1)
+                    vecino = (cActual[0], cActual[1] - 1)
                 elif d == 'N':
-                    childCell = (cActual[0] - 1, cActual[1])
+                    vecino = (cActual[0] - 1, cActual[1])
                 elif d == 'S':
-                    childCell = (cActual[0] + 1, cActual[1])
+                    vecino = (cActual[0] + 1, cActual[1])
                 temp_g = g[cActual] + 1
-                temp_f = temp_g + h(childCell, m._goal)
+                temp_f = temp_g + h(vecino, m._goal)
 
-                if temp_f < f[childCell]:
-                    reversePath[childCell] = cActual
-                    g[childCell] = temp_g
-                    f[childCell] = temp_f
-                    list.append((temp_f, childCell))
-                print("Actual: ", cActual, "Vecino: ", childCell, "f_temp: ", temp_f, "f[vecino]: ", f[childCell], "g_temp: ", temp_g, "g[vecino]:", g[childCell])
+                if temp_f < f[vecino]:
+                    reversePath[vecino] = cActual
+                    g[vecino] = temp_g
+                    f[vecino] = temp_f
+                    list.append((temp_f, vecino))
+                print("Actual: ", cActual, "Vecino: ", vecino, "f_temp: ", temp_f, "f[vecino]: ", f[vecino], "g_temp: ", temp_g, "g[vecino]:", g[vecino])
     opPath = {}
     cell = m._goal
     while cell != start:
