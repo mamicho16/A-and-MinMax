@@ -214,7 +214,7 @@ def simulacion_varios_juegos():
     contador_min = 0  # Reinicia el contador de victorias de MinMax
     contador_perdidas = 0  # Reinicia el contador de derrotas de MinMax
     contador_empates = 0  # Contador de empates
-    juegos = 10  # Número de juegos a simular
+    juegos = 500  # Número de juegos a simular
     for partida in range(1, juegos + 1):
         print("Partida:", partida)
         tablero = [[" " for _ in range(3)] for _ in range(3)]  # Inicializa un nuevo tablero
