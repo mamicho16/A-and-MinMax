@@ -1,7 +1,7 @@
 import random
 
 # VARIABLES GLOBALES
-jugadores = ["MinMax", "Humano", "Aleatorio"]  # Lista de jugadores disponibles
+jugadores = ["MinMax", "Humano"]  # Lista de jugadores disponibles
 contador_min = 0  # Contador para las victorias de MinMax
 contador_perdidas = 0  # Contador para las derrotas de MinMax
 
@@ -144,12 +144,6 @@ def jugar(tablero, simbolo, oponente, funcion_jugada):
     tablero[fila][columna] = simbolo 
     imprimir_tablero(tablero) # Se imprime el tablero por cada uno de los juegos de la simulacion.
 
-def humano_juega(tablero, simbolo, oponente):
-    """
-    Permite al jugador humano realizar un movimiento.
-    """
-    print("Turno del jugador humano:")
-    return int(input("Fila: ")), int(input("Columna: "))
 
 def aleatorio_juega(tablero, simbolo, oponente):
     """
@@ -178,8 +172,6 @@ def main():
         print("Partida:", numero_partida)
         if jugadores_seleccionados[turno] == 0:
             jugar(tablero, turno, "O" if turno == "X" else "X", minMax_juega)
-        elif jugadores_seleccionados[turno] == 1:
-            jugar(tablero, turno, "O" if turno == "X" else "X", humano_juega)
         else:
             jugar(tablero, turno, "O" if turno == "X" else "X", aleatorio_juega)
         resultado = evaluar(tablero, turno, "O" if turno == "X" else "X")
