@@ -1,7 +1,7 @@
 import random
 
 # VARIABLES GLOBALES
-jugadores = ["MinMax", "Humano"]  # Lista de jugadores disponibles
+jugadores = ["MinMax", "Aleatorio"]  # Lista de jugadores disponibles
 contador_min = 0  # Contador para las victorias de MinMax
 contador_perdidas = 0  # Contador para las derrotas de MinMax
 
